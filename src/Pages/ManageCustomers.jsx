@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 const ManageCustomers = () => {
   const [customers, setCustomers] = useState([]);
-  const customerId = 12;
+  // const customerId = 12;
 
   useEffect(() => {
     // Fetching customers from the backend

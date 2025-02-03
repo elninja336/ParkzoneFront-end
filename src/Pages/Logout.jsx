@@ -12,7 +12,7 @@ const Logout = () => {
     // For now, we just redirect to the login page
 
     // Simulate clearing session data (localStorage, cookies, etc.)
-    localStorage.removeItem('userSession'); // Example: clear session storage
+    // localStorage.removeItem('userSession'); // Example: clear session storage
 
     // Redirect to login page after logout
     navigate('/');
