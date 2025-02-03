@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "20": "^3.1.9",
     "@eslint/config-array": "^0.19.2",
     "@eslint/object-schema": "^2.1.6",
     "@rollup/plugin-terser": "^0.4.4",
