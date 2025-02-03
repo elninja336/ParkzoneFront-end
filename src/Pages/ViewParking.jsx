@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ViewParking.css';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 
 const ViewParking = () => {
   const [parkingData, setParkingData] = useState([]);

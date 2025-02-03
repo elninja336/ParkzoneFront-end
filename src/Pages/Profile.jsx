@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../axiosInstance';  
 import './Profile.css';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 const Profile = () => {
   const [profile, setProfile] = useState({
     name: '',

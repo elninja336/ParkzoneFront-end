@@ -1,13 +1,13 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 import React from 'react';
-import Headers from './Component/Headers';
-import Footer from './Component/Footer';
+// import Headers from './Component/Headers';
+// import Footer from './Component/Footer';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Pages/Home';
 import About from './Pages/About';
 import Dashboard from './Pages/Dashboard';
-import ManageParkingLots from './Pages/ManageReservation';
+// import ManageParkingLots from './Pages/ManageReservation';
 import ManageSlots from './Pages/ManageSlots';
 import ManageCustomers from './Pages/ManageCustomers';
 import Reports from './Pages/Reports';

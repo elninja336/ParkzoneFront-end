@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../axiosInstance';
 import './ManageCustomers.css';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 
 const ManageCustomers = () => {
   const [customers, setCustomers] = useState([]);
