@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../axiosInstance';
 import './ManageCustomers.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const ManageCustomers = () => {
   const [customers, setCustomers] = useState([]);
@@ -10,6 +11,7 @@ const ManageCustomers = () => {
 
   useEffect(() => {
     // Fetching customers from the backend
+    // axios.get(http://)
     axiosInstance.get('/customers/')
       .then(response => {
         setCustomers(response.data);
