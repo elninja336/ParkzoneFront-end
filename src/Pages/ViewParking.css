@@ -44,3 +44,32 @@ body {
 .book-button:hover {
     background-color: #005bb5;
 }
+
+.reservation-form {
+  margin-top: 15px;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.reservation-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.reservation-form input,
+.reservation-form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+.reservation-form button {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

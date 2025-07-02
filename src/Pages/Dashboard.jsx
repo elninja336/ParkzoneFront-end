@@ -15,8 +15,15 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Fetching parking data
-        const response = await axiosInstance.get('/parklots');
-        const { available, occupied, reserved, occupancyRate } = response.data;
+      const response = await axiosInstance.get('/parkinglots/');
+      const allSlots = response.data;
+
+      const available = allSlots.filter(slot => slot.availability === "AVAILABLE").length;
+      const occupied = allSlots.filter(slot => slot.availability === "OCCUPIED").length;
+      const reserved = allSlots.filter(slot => slot.availability === "RESERVED").length;
+      const total = allSlots.length;
+      const occupancyRate = total > 0 ? Math.round((occupied / total) * 100) : 0;
+
 
         // Setting the state with the fetched data
         setAvailableSlots(available);
@@ -64,13 +71,7 @@ const Dashboard = () => {
       <Link to="/logout" lassName="logout-link">
       Logout
       </Link>
-        {/* <a href="/dashboard">Dashboard</a>
-        <a href="/manage-reservations">Manage Reservations</a>
-        <a href="/manage-slots">Manage Slots</a>
-        <a href="manage-customers">Manage Customers</a>
-        <a href="/manage-payments">Manage Payments</a>
-        <a href="/reports">Reports</a>
-        <a href="/logout" className="logout-link">Logout</a> */}
+        
       </nav>
       <div className="container">
         <h2>Welcome, Admin</h2>

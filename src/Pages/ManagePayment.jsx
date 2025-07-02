@@ -140,7 +140,7 @@ const ManagePayments = () => {
             <label>
               Customer Name:
               <input
-                type="number"
+                type="text"
                 value={newPayment.customer}
                 onChange={(e) => setNewPayment({ ...newPayment, customer: e.target.value })}
                 required

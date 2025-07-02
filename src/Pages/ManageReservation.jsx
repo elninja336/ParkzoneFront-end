@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 const ManageReservation = () => {
   const [reservations, setReservations] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [parkingLots, setParkingLots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editReservation, setEditReservation] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -18,9 +20,11 @@ const ManageReservation = () => {
     status: 'PENDING',
   });
 
-  // Fetch reservations from the backend
+  // Fetch data
   useEffect(() => {
     fetchReservations();
+    fetchCustomers();
+    fetchParkingLots();
   }, []);
 
   const fetchReservations = () => {
@@ -37,7 +41,20 @@ const ManageReservation = () => {
       });
   };
 
-  // Handle editing a reservation
+  const fetchCustomers = () => {
+    axiosInstance
+      .get('/customers/')
+      .then((res) => setCustomers(res.data))
+      .catch((err) => console.error('Error fetching customers:', err));
+  };
+
+  const fetchParkingLots = () => {
+    axiosInstance
+      .get('/parkinglots/')
+      .then((res) => setParkingLots(res.data))
+      .catch((err) => console.error('Error fetching parking lots:', err));
+  };
+
   const handleEdit = (reservation) => {
     setEditReservation({ ...reservation });
     setShowEditModal(true);
@@ -57,7 +74,6 @@ const ManageReservation = () => {
       });
   };
 
-  // Handle adding a new reservation
   const handleSaveNew = () => {
     axiosInstance
       .post('/reservations/', newReservation)
@@ -101,108 +117,102 @@ const ManageReservation = () => {
         <h1>Manage Reservations</h1>
       </header>
       <nav className="nav">
-      <Link to="/dashboard" >
-            Dashboard
-      </Link>
-      <Link to="/manage-reservations" >
-      Manage Reservations
-      </Link>
-      <Link to="/manage-slots" >
-      Manage Slots
-      </Link>
-      <Link to="/manage-customers" >
-      Manage Customers
-      </Link>
-      <Link to="/manage-payments" >
-      Manage Payments
-      </Link>
-      <Link to="/reports" >
-      Reports
-      </Link>
-      <Link to="/logout" lassName="logout-link">
-      Logout
-      </Link>
-        {/* <a href="/dashboard">Dashboard</a> */}
-        {/* <a href="/manage-reservations">Manage Reservations</a>
-        <a href="/manage-slots">Manage Slots</a>
-        <a href="manage-customers">Manage Customers</a>
-        <a href="/manage-payments">Manage Payments</a>
-        <a href="/reports">Reports</a>
-        <a href="/logout" className="logout-link">Logout</a> */}
+        <Link to="/dashboard">Dashboard</Link>
+        <Link to="/manage-reservations">Manage Reservations</Link>
+        <Link to="/manage-slots">Manage Slots</Link>
+        <Link to="/manage-customers">Manage Customers</Link>
+        <Link to="/manage-payments">Manage Payments</Link>
+        <Link to="/reports">Reports</Link>
+        <Link to="/logout" className="logout-link">Logout</Link>
       </nav>
+
       <div className="container">
-        {/* <h2>Reservations</h2> */}
         <button className="add-button" onClick={() => setShowAddModal(true)}>
           Add Reservation
         </button>
 
-
         {/* Add Reservation Modal */}
-      {showAddModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Add New Reservation</h2>
-            <label>
-              Customer:
-              <input
-                type="text"
-                value={newReservation.customer}
-                onChange={(e) =>
-                  setNewReservation({ ...newReservation, customer: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Parking Lot:
-              <input
-                type="text"
-                value={newReservation.parkingLot}
-                onChange={(e) =>
-                  setNewReservation({ ...newReservation, parkingLot: e.target.value })
-                }
-              />
-            </label>
-            
-            <label>
-              Start Date:
-              <input
-                type="date"
-                value={newReservation.startDate}
-                onChange={(e) =>
-                  setNewReservation({ ...newReservation, startDate: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              End Date:
-              <input
-                type="date"
-                value={newReservation.endDate}
-                onChange={(e) =>
-                  setNewReservation({ ...newReservation, endDate: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Status:
-              <select
-                value={newReservation.status}
-                onChange={(e) =>
-                  setNewReservation({ ...newReservation, status: e.target.value })
-                }
-              >
-                <option value="PENDING">Pending</option>
-                <option value="COMFIRMED">Confirmed</option>
-                <option value="CENCELLED">Cancelled</option>
-              </select>
-            </label>
-            <div className="modal-buttons">
-              <button className="save-button" onClick={handleSaveNew}>Add</button>
-              <button className="cencel-button" onClick={() => setShowAddModal(false)}>Cancel</button>
+        {showAddModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Add New Reservation</h2>
+
+              <label>
+                Customer:
+                <select
+                  value={newReservation.customer}
+                  onChange={(e) =>
+                    setNewReservation({ ...newReservation, customer: e.target.value })
+                  }
+                >
+                  <option value="">-- Select Customer --</option>
+                  {customers.map((cust) => (
+                    <option key={cust.id} value={cust.email}>
+                      {cust.name} ({cust.email})
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Parking Lot:
+                <select
+                  value={newReservation.parkingLot}
+                  onChange={(e) =>
+                    setNewReservation({ ...newReservation, parkingLot: e.target.value })
+                  }
+                >
+                  <option value="">-- Select Parking Lot --</option>
+                  {parkingLots.map((lot) => (
+                    <option key={lot.id} value={lot.slotNumber}>
+                      {lot.slotNumber}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Start Date:
+                <input
+                  type="date"
+                  value={newReservation.startDate}
+                  onChange={(e) =>
+                    setNewReservation({ ...newReservation, startDate: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                End Date:
+                <input
+                  type="date"
+                  value={newReservation.endDate}
+                  onChange={(e) =>
+                    setNewReservation({ ...newReservation, endDate: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Status:
+                <select
+                  value={newReservation.status}
+                  onChange={(e) =>
+                    setNewReservation({ ...newReservation, status: e.target.value })
+                  }
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="COMFIRMED">Confirmed</option>
+                  <option value="CENCELLED">Cancelled</option>
+                </select>
+              </label>
+
+              <div className="modal-buttons">
+                <button className="save-button" onClick={handleSaveNew}>Add</button>
+                <button className="cencel-button" onClick={() => setShowAddModal(false)}>Cancel</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
         {loading ? (
           <p>Loading reservations...</p>
         ) : (
@@ -261,6 +271,7 @@ const ManageReservation = () => {
         <div className="modal">
           <div className="modal-content">
             <h2>Edit Reservation</h2>
+
             <label>
               Customer:
               <input
@@ -271,6 +282,7 @@ const ManageReservation = () => {
                 }
               />
             </label>
+
             <label>
               Parking Lot:
               <input
@@ -281,6 +293,7 @@ const ManageReservation = () => {
                 }
               />
             </label>
+
             <label>
               Reservation Date:
               <input
@@ -291,6 +304,7 @@ const ManageReservation = () => {
                 }
               />
             </label>
+
             <label>
               Start Date:
               <input
@@ -301,6 +315,7 @@ const ManageReservation = () => {
                 }
               />
             </label>
+
             <label>
               End Date:
               <input
@@ -311,6 +326,7 @@ const ManageReservation = () => {
                 }
               />
             </label>
+
             <label>
               Status:
               <select
@@ -324,6 +340,7 @@ const ManageReservation = () => {
                 <option value="CENCELLED">Cancelled</option>
               </select>
             </label>
+
             <div className="modal-buttons">
               <button className="save-button" onClick={handleSaveEdit}>Save</button>
               <button className="cencel-button" onClick={() => setShowEditModal(false)}>Cancel</button>
@@ -331,8 +348,6 @@ const ManageReservation = () => {
           </div>
         </div>
       )}
-
-      
     </div>
   );
 };

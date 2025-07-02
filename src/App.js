@@ -82,7 +82,7 @@ const App = () => {
               <Route path='/manage-customers' element={<ManageCustomers />} />
               <Route path='/reports' element={<Reports />} />
               <Route path='/logout' element={<Logout />} />
-              {/* Customer pages */}
+              {/* My Customer pages */}
               <Route path="/customer" element= {<Customer />} />
               <Route path="/customer-home" element= {<CustomerHome />} />
               <Route path="/view-parking" element={<ViewParking />} />

@@ -13,7 +13,7 @@ const ManageSlots = () => {
     slotNumber: '',
     availability: 'AVAILABLE',
     category: 'TEMPORARY',
-    price: '',
+    price: '1000',
   });
 
   // Fetch parking lot data
@@ -160,17 +160,32 @@ const ManageSlots = () => {
               </select>
             </label>
             <label>
-              Category:
-              <select
-                value={newSlot.category}
-                onChange={(e) =>
-                  setNewSlot({ ...newSlot, category: e.target.value })
-                }
-              >
-                <option value="TEMPORARY">Temporary</option>
-                <option value="PARMANENT">Parmanent</option>
-              </select>
+                Category:
+                <select
+                  value={newSlot.category}
+                  onChange={(e) => {
+                    const selectedCategory = e.target.value;
+                    let updatedPrice = newSlot.price;
+
+                    // Set price based on selected category
+                    if (selectedCategory === 'TEMPORARY') {
+                      updatedPrice = 1000; 
+                    } else if (selectedCategory === 'PARMANENT') {
+                      updatedPrice = 25000;
+                    }
+
+                    setNewSlot({
+                      ...newSlot,
+                      category: selectedCategory,
+                      price: updatedPrice,
+                    });
+                  }}
+                >
+                  <option value="TEMPORARY">Temporary</option>
+                  <option value="PARMANENT">Parmanent</option>
+                </select>
             </label>
+
             <label>
               Price:
               <input
