@@ -5,45 +5,72 @@ import './ViewParking.css';
 const ViewParking = () => {
   const [temporaryData, setTemporaryData] = useState({ slots: [], price: 0 });
   const [permanentData, setPermanentData] = useState({ slots: [], price: 0 });
+
   const [showFormFor, setShowFormFor] = useState(null); // "TEMPORARY" or "PARMANENT"
   const [selectedLot, setSelectedLot] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Moved fetchParkingData out of useEffect so it can be reused
+  const fetchParkingData = async () => {
+    try {
+      const response = await axiosInstance.get('/parkinglots/');
+      const slots = response.data;
+      const availableSlots = slots.filter(slot => slot.availability === 'AVAILABLE');
+
+      const temporarySlots = availableSlots.filter(slot => slot.category === 'TEMPORARY');
+      const permanentSlots = availableSlots.filter(slot => slot.category === 'PARMANENT');
+
+      setTemporaryData({
+        slots: temporarySlots,
+        price: temporarySlots.length > 0 ? temporarySlots[0].price : 0,
+      });
+
+      setPermanentData({
+        slots: permanentSlots,
+        price: permanentSlots.length > 0 ? permanentSlots[0].price : 0,
+      });
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching parking data:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchParkingData = async () => {
-      try {
-        const response = await axiosInstance.get('/parkinglots/');
-        const slots = response.data;
-        const availableSlots = slots.filter(slot => slot.availability === 'AVAILABLE');
-
-        const temporarySlots = availableSlots.filter(slot => slot.category === 'TEMPORARY');
-        const permanentSlots = availableSlots.filter(slot => slot.category === 'PARMANENT');
-
-        setTemporaryData({
-          slots: temporarySlots,
-          price: temporarySlots.length > 0 ? temporarySlots[0].price : 0,
-        });
-
-        setPermanentData({
-          slots: permanentSlots,
-          price: permanentSlots.length > 0 ? permanentSlots[0].price : 0,
-        });
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching parking data:', error);
-        setLoading(false);
-      }
-    };
-
     fetchParkingData();
   }, []);
 
+  // New helper function to update parking lot availability via PUT with full data
+  const updateParkingAvailability = async (parkingLotId) => {
+    try {
+      // Fetch the full parking lot data by ID
+      const response = await axiosInstance.get(`/parkinglots/${parkingLotId}`);
+      const parkingLotData = response.data;
+
+      // Update availability field only
+      const updatedData = {
+        slotNumber: parkingLotData.slotNumber,
+        category: parkingLotData.category,
+        price: parkingLotData.price,
+        availability: 'RESERVED',
+      };
+
+      // Send PUT request with full updated data
+      await axiosInstance.put(`/parkinglots/${parkingLotId}`, updatedData);
+
+      // Refresh parking lots data after update
+      fetchParkingData();
+    } catch (error) {
+      console.error('Error updating parking lot availability:', error);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const payload = {
       customer: localStorage.getItem('customer_email'),
       parkingLot: selectedLot,
@@ -57,6 +84,17 @@ const ViewParking = () => {
       .post('/reservations/', payload)
       .then(() => {
         alert('Reservation successful!');
+
+        // Find the slot object by slotNumber before updating availability
+        const allSlots = [...temporaryData.slots, ...permanentData.slots];
+        const selectedSlotObj = allSlots.find(slot => slot.slotNumber === selectedLot);
+
+        if (selectedSlotObj) {
+          updateParkingAvailability(selectedSlotObj.id);
+        } else {
+          console.error('Selected slot not found!');
+        }
+
         setShowFormFor(null);
         setSelectedLot('');
         setStartDate('');
