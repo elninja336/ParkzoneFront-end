@@ -68,3 +68,60 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+# ParkZone Frontend
+
+This is the frontend for the **ParkZone Parking Management System** built with **ReactJS**.
+
+##  Project Structure
+
+- `src/Pages/` - Contains all main pages (CustomerHome, ViewParking, MyAccount, etc.)
+- `src/Component/` - Shared components (if any)
+- `src/axiosInstance.js` - Axios instance configured for backend API calls
+- `App.js` - Main application routes and layout
+
+##  Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
+- npm or yarn
+
+### Installation
+
+```bash
+cd frontend
+npm install
+```
+
+### Run the App
+
+```bash
+npm start
+```
+
+This will start the development server at `http://localhost:3000`.
+
+##  Protected Routes
+
+Pages like `/customer-home`, `/my-account`, `/profile` are protected and require a valid customer session (checked from `localStorage`).
+
+##  API Endpoints Used
+
+- `POST /api/customers/login` - Custom login for customers
+- `POST /api/token/` - JWT login for admin (Django user)
+- `GET /api/parkinglots/` - View available slots
+- `POST /api/reservations/` - Make reservation
+- `GET /api/reservations/` - View current bookings
+- `PUT /api/customers/<id>/` - Update profile
+- `GET /api/customers/<id>/` - Get customer details
+
+##  Notes
+
+- Login details are stored in `localStorage`
+- API requests use a centralized `axiosInstance`
+- Page access is restricted based on authentication presence
+
+## 👨‍💻 Developer
+
+Built by [Fatma Suleiman] & Abdillah Ali
