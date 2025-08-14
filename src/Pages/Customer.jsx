@@ -12,7 +12,7 @@ const Customer = () => {
         <Link to="/customer-home">Home</Link>
         <Link to="/view-parking">View Parking</Link>
         <Link to="/my-account">My Account</Link>
-        <Link to="/support">Support</Link>
+        <Link to="#">Support</Link>
         <Link to="/logout" className='logout-link'>Logout</Link>
       </nav>
       <div className="customer-home-container">
@@ -29,14 +29,14 @@ const Customer = () => {
             View Account Details
           </Link>
           <br />
-          <Link to="/book" className="action-button">
+          {/* <Link to="/book" className="action-button">
             Book now
-          </Link>
+          </Link> */}
         </div>
         <div className="contact-support">
           <h3>Need Help?</h3>
           <p>Contact our support team for assistance.</p>
-          <Link to="/support" className="support-button">
+          <Link to="#" className="support-button">
             Contact Support
           </Link>
         </div>

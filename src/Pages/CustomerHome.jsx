@@ -1,27 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import './CustomerHome.css';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosInstance';
 
 const CustomerHome = () => {
   const [availableParking, setAvailableParking] = useState([]);
   const [currentBookings, setCurrentBookings] = useState([]);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState({});
+  const navigate = useNavigate();
+
+  const handleEditProfile = () => {
+    navigate('/profile');
+  };
+
+  const handleViewBooking = (booking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
-    // Read customer details from localStorage
     const name = localStorage.getItem('customer_name');
     const email = localStorage.getItem('customer_email');
     const phone = localStorage.getItem('customer_phone');
+    const residence = localStorage.getItem('customer_residence');
 
     setUserProfile({
       name: name || '',
       email: email || '',
       phone: phone || '',
+      residence: residence || '',
     });
 
-    // You can later implement fetching bookings if needed
-    setCurrentBookings([
-      { id: 1, lotName: 'Parking Lot A', date: '2025-01-16', time: '3 hours' },
-    ]);
+    axiosInstance.get('/reservations/')
+      .then((response) => {
+        const userReservations = response.data.filter(
+          (reservation) => reservation.customer === email
+        );
+        setCurrentBookings(userReservations);
+      })
+      .catch((error) => {
+        console.error('Error fetching reservations:', error);
+      });
   }, []);
 
   return (
@@ -42,10 +63,13 @@ const CustomerHome = () => {
             <div className="current-bookings-list">
               {currentBookings.map((booking) => (
                 <div key={booking.id} className="booking-card">
-                  <h3>{booking.lotName}</h3>
-                  <p>Date: {booking.date}</p>
-                  <p>Time: {booking.time}</p>
-                  <button className="view-booking-button">View Booking</button>
+                  <h3>Slot: {booking.parkingLot}</h3>
+                  <p>Start: {booking.startDate}</p>
+                  <p>End: {booking.endDate}</p>
+                  <p>Status: {booking.status}</p>
+                  <button className="view-booking-button" onClick={() => handleViewBooking(booking)}>
+                    View Booking
+                  </button>
                 </div>
               ))}
             </div>
@@ -61,19 +85,25 @@ const CustomerHome = () => {
             <p>Name: {userProfile.name}</p>
             <p>Email: {userProfile.email}</p>
             <p>Phone: {userProfile.phone}</p>
-            <button className="edit-profile-button">Edit Profile</button>
+            <p>Residence: {userProfile.residence}</p>
+            <button className="edit-profile-button" onClick={handleEditProfile}>Edit Profile</button>
           </div>
         </section>
-
-        {/* Notifications Section */}
-        <section className="notifications-section">
-          <h2>Notifications</h2>
-          <ul>
-            <li>Your booking at Parking Lot A is confirmed!</li>
-            <li>Reminder: Your parking at Downtown expires in 2 hours.</li>
-          </ul>
-        </section>
       </main>
+
+      {isModalOpen && selectedBooking && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Booking Details</h2>
+            <p><strong>Slot Number:</strong> {selectedBooking.parkingLot}</p>
+            <p><strong>Reservation Date:</strong> {selectedBooking.reservationDate}</p>
+            <p><strong>Start Date:</strong> {selectedBooking.startDate}</p>
+            <p><strong>End Date:</strong> {selectedBooking.endDate}</p>
+            <p><strong>Status:</strong> {selectedBooking.status}</p>
+            <button onClick={() => setIsModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

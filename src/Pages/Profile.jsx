@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../axiosInstance';  
+import axiosInstance from '../axiosInstance';
 import './Profile.css';
-// import { Link } from 'react-router-dom';
+
 const Profile = () => {
   const [profile, setProfile] = useState({
     name: '',
@@ -10,68 +10,79 @@ const Profile = () => {
     residence: '',
   });
 
+  const [customerId, setCustomerId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const customerId = 2; // Use actual customer ID, e.g., from localStorage or auth context
-
-  // Fetch profile data on component mount
   useEffect(() => {
-    axiosInstance.get(`customers/${customerId}`)
-      .then((response) => {
-        setProfile(response.data);  // Set profile data from backend
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError('Error fetching profile data.');
-        setLoading(false);
-      });
-  }, [customerId]);
+    const fetchCustomer = async () => {
+      try {
+        const email = localStorage.getItem('customer_email');
+        if (!email) {
+          setError('Customer not logged in.');
+          setLoading(false);
+          return;
+        }
 
-  // Handle input change
+        const response = await axiosInstance.get('/customers/');
+        const customer = response.data.find((c) => c.email === email);
+
+        if (!customer) {
+          setError('Customer not found.');
+          setLoading(false);
+          return;
+        }
+
+        setCustomerId(customer.id);
+        setProfile({
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          residence: customer.residence,
+        });
+
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch profile data.');
+        setLoading(false);
+      }
+    };
+
+    fetchCustomer();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      [name]: value,
-    }));
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle save and update profile data
-  const handleSave = () => {
-    setIsEditing(false);
-    axiosInstance.put(`customers/${customerId}`, profile)  // Send updated data to backend
-      .then((response) => {
-        alert('Profile updated successfully!');
-        setProfile(response.data);  // Optionally update with the response from backend
-      })
-      .catch((error) => {
-        alert('Error updating profile!');
-        console.error(error);
-      });
+  const handleSave = async () => {
+    if (!customerId) return;
+
+    try {
+      const response = await axiosInstance.put(`/customers/${customerId}`, profile);
+      alert('Profile updated successfully!');
+      setProfile(response.data);
+      setIsEditing(false);
+
+      // Optionally update localStorage
+      localStorage.setItem('customer_name', response.data.name);
+      localStorage.setItem('customer_email', response.data.email);
+      localStorage.setItem('customer_phone', response.data.phone);
+      localStorage.setItem('customer_residence', response.data.residence);
+    } catch (error) {
+      alert('Failed to update profile.');
+      console.error(error);
+    }
   };
 
-  // Handle cancel and reset values (optional)
   const handleCancel = () => {
-    setIsEditing(false);
-    // Optionally reset to original values if needed, or refetch data from the backend
-    setProfile({
-      name: '',
-      email: '',
-      phone: '',
-      residence: '',
-    });
+    window.location.reload(); // simple reset
   };
 
-  // Show loading spinner or error message if needed
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="profile-container">
@@ -80,12 +91,7 @@ const Profile = () => {
         <div className="profile-item">
           <label>Full Name:</label>
           {isEditing ? (
-            <input
-              type="text"
-              name="name"
-              value={profile.name}
-              onChange={handleInputChange}
-            />
+            <input name="name" value={profile.name} onChange={handleInputChange} />
           ) : (
             <p>{profile.name}</p>
           )}
@@ -93,12 +99,7 @@ const Profile = () => {
         <div className="profile-item">
           <label>Email:</label>
           {isEditing ? (
-            <input
-              type="email"
-              name="email"
-              value={profile.email}
-              onChange={handleInputChange}
-            />
+            <input name="email" value={profile.email} onChange={handleInputChange} />
           ) : (
             <p>{profile.email}</p>
           )}
@@ -106,12 +107,7 @@ const Profile = () => {
         <div className="profile-item">
           <label>Phone:</label>
           {isEditing ? (
-            <input
-              type="tel"
-              name="phone"
-              value={profile.phone}
-              onChange={handleInputChange}
-            />
+            <input name="phone" value={profile.phone} onChange={handleInputChange} />
           ) : (
             <p>{profile.phone}</p>
           )}
@@ -119,30 +115,21 @@ const Profile = () => {
         <div className="profile-item">
           <label>Residence:</label>
           {isEditing ? (
-            <textarea
-              name="residence"
-              value={profile.residence}
-              onChange={handleInputChange}
-            ></textarea>
+            <textarea name="residence" value={profile.residence} onChange={handleInputChange} />
           ) : (
             <p>{profile.residence}</p>
           )}
         </div>
       </div>
+
       <div className="profile-actions">
         {isEditing ? (
           <>
-            <button className="save-button" onClick={handleSave}>
-              Save
-            </button>
-            <button className="cancel-button" onClick={handleCancel}>
-              Cancel
-            </button>
+            <button className="save-button" onClick={handleSave}>Save</button>
+            <button className="cancel-button" onClick={handleCancel}>Cancel</button>
           </>
         ) : (
-          <button className="edit-button" onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </button>
+          <button className="edit-button" onClick={() => setIsEditing(true)}>Edit Profile</button>
         )}
       </div>
     </div>

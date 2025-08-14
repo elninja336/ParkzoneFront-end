@@ -68,3 +68,57 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+
+React Frontend - ParkZone Parking Management System
+===================================================
+
+Overview:
+---------
+This is the frontend for the ParkZone system, developed using React. It allows customers to:
+- Log in or sign up
+- View available parking slots
+- Book temporary or permanent parking
+- View their current reservations
+- Update their profile information
+
+Project Structure:
+------------------
+- src/
+  - Pages/: Contains different UI pages like CustomerHome, ViewParking, Profile, etc.
+  - Components/: (Optional) For reusable UI components
+  - axiosInstance.js: Configured Axios instance for API calls
+  - App.js: Main routing and page rendering setup
+- public/: Contains the index.html template
+- package.json: React project dependencies and scripts
+
+How to Run:
+-----------
+1. Open a terminal in the `frontend/` directory.
+2. Install dependencies:
+3. Start the development server:
+4. Access the frontend at: http://localhost:5173/
+
+markdown
+Copy
+Edit
+Delete
+
+API Connection:
+---------------
+All API calls are made to the Django backend running on `http://127.0.0.1:8000/api/`. Make sure the backend is running when using the frontend.
+
+Environment Setup:
+------------------
+To configure base URLs or environment-specific settings, you can optionally create a `.env` file.
+
+Authentication:
+---------------
+- JWT access tokens (from Django SimpleJWT) are stored and validated.
+- LocalStorage is used to store customer details (e.g., name, email, token).
+- Protected routes redirect unauthenticated users to the login page.
+
+
+

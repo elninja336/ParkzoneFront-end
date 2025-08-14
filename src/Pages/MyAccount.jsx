@@ -4,28 +4,45 @@ import { Link } from 'react-router-dom';
 import axiosInstance from '../axiosInstance';
 
 const MyAccount = () => {
-  const customerId = 2; // Simulating customer ID
-  const [accountDetails, setAccountDetails] = useState(null); // To store fetched data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [accountDetails, setAccountDetails] = useState(null);
+  const [parkingHistory, setParkingHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch customer details
   useEffect(() => {
-    const fetchAccountDetails = async () => {
+    const fetchAccountAndHistory = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(`/customers/${customerId}`);
-        setAccountDetails(response.data);
+        const loggedInEmail = localStorage.getItem('customer_email');
+
+        // Fetch all customers and find the current one
+        const customerRes = await axiosInstance.get('/customers/');
+        const customers = customerRes.data;
+        const matchedCustomer = customers.find(c => c.email === loggedInEmail);
+
+        if (matchedCustomer) {
+          setAccountDetails(matchedCustomer);
+
+          // Fetch reservations for the current customer
+          const reservationRes = await axiosInstance.get('/reservations/');
+          const reservations = reservationRes.data;
+          const customerReservations = reservations.filter(r => r.customer === loggedInEmail);
+
+          setParkingHistory(customerReservations);
+        } else {
+          setError('Customer not found.');
+        }
+
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching customer details:', err);
+        console.error('Error loading account or history:', err);
         setError('Failed to load account details. Please try again.');
         setLoading(false);
       }
     };
 
-    fetchAccountDetails();
-  }, [customerId]);
+    fetchAccountAndHistory();
+  }, []);
 
   if (loading) {
     return <p>Loading account details...</p>;
@@ -49,15 +66,18 @@ const MyAccount = () => {
             <p><strong>Email:</strong> {accountDetails.email}</p>
             <p><strong>Phone:</strong> {accountDetails.phone}</p>
             <p><strong>Residence:</strong> {accountDetails.residence}</p>
-    
           </div>
+          <Link to="/profile" className="action-button" id="btn">
+        Edit Personal Details
+      </Link>
+
           <div className="parking-history">
             <h2>Parking History</h2>
             <ul>
-              {accountDetails.parkingHistory && accountDetails.parkingHistory.length > 0 ? (
-                accountDetails.parkingHistory.map((entry) => (
+              {parkingHistory.length > 0 ? (
+                parkingHistory.map((entry) => (
                   <li key={entry.id}>
-                    {entry.date} - Slot: {entry.slot}, Price: {entry.price}
+                    Slot: {entry.parkingLot}, From: {entry.startDate}, To: {entry.endDate}, Status: {entry.status}
                   </li>
                 ))
               ) : (
@@ -67,9 +87,7 @@ const MyAccount = () => {
           </div>
         </div>
       )}
-      <Link to="/profile" className="action-button" id="btn">
-        Edit Personal Details
-      </Link>
+      
     </div>
   );
 };

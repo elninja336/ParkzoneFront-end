@@ -14,6 +14,10 @@ body {
     padding: 2rem;
     text-align: center;
 }
+#cencel{
+    background-color: #0073e6;
+    margin-right: 10px;
+}
 .logout-button {
     background-color: #dc3545;
     color: white;
@@ -26,8 +30,4 @@ body {
 }
 .logout-button:hover {
     background-color: #c82333;
-}
-#cencel{
-    background-color: #0073e6;
-    margin-right: 10px;
 }

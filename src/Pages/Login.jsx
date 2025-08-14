@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosInstance';
-import './Login.css'; 
+import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,72 +14,83 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axiosInstance.post('/customers/login', {
+      // 1. Try Customer Login First
+      const customerRes = await axiosInstance.post('/customers/login', {
         email,
         password,
       });
 
-      if (response.data && response.data.message === 'Login successful') {
+      if (customerRes.data && customerRes.data.message === 'Login successful') {
         // Store customer info in localStorage
-        localStorage.setItem('customer_id', response.data.customer_id);
-        localStorage.setItem('customer_name', response.data.name);
-        localStorage.setItem('customer_email', response.data.email);
-        localStorage.setItem('customer_phone', response.data.phone);
-        localStorage.setItem('customer_residence', response.data.residence);
+        localStorage.setItem('customer_id', customerRes.data.customer_id);
+        localStorage.setItem('customer_name', customerRes.data.name);
+        localStorage.setItem('customer_email', customerRes.data.email);
+        localStorage.setItem('customer_phone', customerRes.data.phone);
+        localStorage.setItem('customer_residence', customerRes.data.residence);
 
         // Navigate to Customer Home
-        navigate('/customer');
-      } else {
-        setError('Invalid login. Please try again.');
+        return navigate('/customer');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Invalid email or password.');
+      // Continue to try user login with /api/token/
+    }
+
+    try {
+      // 2. Try Django User Login via /api/token/
+      const userRes = await axiosInstance.post('/token/', {
+        username: email, 
+        password: password,
+      });
+
+      if (userRes.data.access) {
+        // Store JWT tokens
+        localStorage.setItem('access_token', userRes.data.access);
+        localStorage.setItem('refresh_token', userRes.data.refresh);
+
+        // You can fetch user details if needed, or navigate directly
+        return navigate('/dashboard'); // or /dashboard
+      }
+    } catch (err) {
+      console.error('Both login attempts failed:', err);
+      setError('Invalid credentials for both customer and user. Please try again.');
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-blue-600 mb-4 text-center">Customer Login</h1>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full p-2 border rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full p-2 border rounded-lg"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-          >
-            Login
-          </button>
-        </form>
+ return (
+  <div className='login-page-wrapper'>
+  <div className="login-container">
+    <h1>Login</h1>
+    {error && <p className="error-message">{error}</p>}
+    <form onSubmit={handleLogin}>
+      <div className="form-group">
+        <label htmlFor="email">Username</label>
+        <input
+          type="text"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
       </div>
-    </div>
-  );
+      <div className="form-group">
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p className="login-link">
+      Don't have an account? <a href="/signup">Sign Up</a>
+    </p>
+  </div>
+  </div>
+);
+
 };
 
 export default Login;

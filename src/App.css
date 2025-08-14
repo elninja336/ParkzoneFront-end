@@ -37,8 +37,8 @@
   }
 }
 body{
-  background-image: url("Parking.jpeg");
-  background-image: url("Tel_Aviv_parking_lot.jpg");
+  /* background-image: url("Parking.jpeg"); */
+  /* background-image: url("Tel_Aviv_parking_lot.jpg"); */
   background-repeat: no-repeat;
   background-position: center;
   background-attachment: fixed;

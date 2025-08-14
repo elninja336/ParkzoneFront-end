@@ -79,7 +79,7 @@ const ViewParking = () => {
       endDate,
       status: 'PENDING',
     };
-    console.log('Sending payload:', payload);
+    // console.log('Sending payload:', payload);
     axiosInstance
       .post('/reservations/', payload)
       .then(() => {

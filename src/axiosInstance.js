@@ -1,9 +1,9 @@
-// src/axiosInstance.js
 
 import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/',  
+  // baseURL: 'https://parkingmgtsystembackend.onrender.com/api/',  
 });
 
 export default axiosInstance;
